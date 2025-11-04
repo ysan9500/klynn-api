@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Klynn API Documentation</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header>
+        <h1>Klynn API Documentation</h1>
+        <p>A simple REST API built with Express and MongoDB (Mongoose).</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. Overview</h2>
+            <p>
+                The Klynn API exposes REST endpoints for managing resources such as
+                <strong>orders</strong>. More resources (e.g. users, products) can be
+                added later and documented on this page in the same format.
+            </p>
+        </section>
+
+        <section>
+            <h2>2. Getting Started</h2>
+            <h3>Base URL</h3>
+            <p>
+                In local development, the API is typically available at:
+            </p>
+            <pre><code>http://localhost:3000</code></pre>
+            <p>
+                The port can be configured with the <code>PORT</code> environment
+                variable, and the MongoDB connection string with
+                <code>MONGODB_URI</code>.
+            </p>
+            <h3>Root Endpoint</h3>
+            <p>
+                A simple health check endpoint is provided at:
+            </p>
+            <pre><code>GET /</code></pre>
+            <p>Response:</p>
+            <pre><code>"Hello from Klynn API"</code></pre>
+        </section>
+
+        <section>
+            <h2>3. Order Resource</h2>
+            <p>
+                The <strong>Order</strong> resource represents a user's order with
+                items, pricing, status, and location.
+            </p>
+
+            <h3>3.1 Order JSON Structure</h3>
+            <p>Example of a complete Order object returned by the API:</p>
+            <pre><code>{
+  "_id": "6734f4f81b2c5d1234567890",
+  "userId": "67223344556677889900aabb",   // MongoDB ObjectId (ref: UserId)
+  "userName": "Jane Doe",
+  "items": [
+    {
+      "type": "coffee",
+      "quantity": 2,
+      "price": 4.5
+    },
+    {
+      "type": "sandwich",
+      "quantity": 1,
+      "price": 7.0
+    }
+  ],
+  "totalAmount": 16.0,
+  "status": "pending",                    // one of: "pending", "processing", "shipped", "delivered", "canceled"
+  "createdAt": "2024-01-01T10:00:00.000Z",
+  "updatedAt": "2024-01-01T10:05:00.000Z",
+  "location": {
+    "latitude": 37.5665,
+    "longitude": 126.9780
+  }
+}</code></pre>
+
+            <h4>Fields</h4>
+            <ul>
+                <li><code>_id</code> (string): Auto-generated MongoDB ObjectId.</li>
+                <li><code>userId</code> (string, required): Reference to the user who created the order.</li>
+                <li><code>userName</code> (string, required): Human-readable user name.</li>
+                <li>
+                    <code>items</code> (array, required): List of ordered items.
+                    Each item has:
+                    <ul>
+                        <li><code>type</code> (string, required): Item type or name.</li>
+                        <li><code>quantity</code> (number, required, min 1): Quantity ordered.</li>
+                        <li><code>price</code> (number, required, min 0): Price per unit.</li>
+                    </ul>
+                </li>
+                <li><code>totalAmount</code> (number, required, min 0): Total price of the order.</li>
+                <li>
+                    <code>status</code> (string):
+                    One of <code>"pending"</code>, <code>"processing"</code>,
+                    <code>"shipped"</code>, <code>"delivered"</code>,
+                    <code>"canceled"</code>. Default is <code>"pending"</code>.
+                </li>
+                <li><code>createdAt</code> (string, ISO date): Automatically set when created.</li>
+                <li><code>updatedAt</code> (string, ISO date): Automatically set and can change on updates.</li>
+                <li>
+                    <code>location</code> (object, required):
+                    <ul>
+                        <li><code>latitude</code> (number, required)</li>
+                        <li><code>longitude</code> (number, required)</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Order API Endpoints</h2>
+            <p>
+                All order-related endpoints are prefixed with
+                <code>/api/orders</code>.
+            </p>
+
+            <article>
+                <h3>4.1 Get All Orders</h3>
+                <p><strong>GET</strong> <code>/api/orders</code></p>
+                <p>Returns a list of all orders.</p>
+                <h4>Response 200 (OK)</h4>
+                <pre><code>[
+  {
+    "_id": "6734f4f81b2c5d1234567890",
+    "userId": "67223344556677889900aabb",
+    "userName": "Jane Doe",
+    "items": [
+      { "type": "coffee", "quantity": 2, "price": 4.5 },
+      { "type": "sandwich", "quantity": 1, "price": 7.0 }
+    ],
+    "totalAmount": 16.0,
+    "status": "pending",
+    "createdAt": "2024-01-01T10:00:00.000Z",
+    "updatedAt": "2024-01-01T10:05:00.000Z",
+    "location": { "latitude": 37.5665, "longitude": 126.9780 }
+  }
+]</code></pre>
+                <h4>Error Response 500 (Server Error)</h4>
+                <pre><code>{
+  "message": "&lt;error message&gt;"
+}</code></pre>
+            </article>
+
+            <article>
+                <h3>4.2 Get Order by ID</h3>
+                <p><strong>GET</strong> <code>/api/orders/:id</code></p>
+                <p>Returns a single order by its MongoDB ObjectId.</p>
+                <h4>Path Parameter</h4>
+                <ul>
+                    <li><code>id</code>: Order <code>_id</code> value.</li>
+                </ul>
+                <h4>Response 200 (OK)</h4>
+                <pre><code>{
+  "_id": "6734f4f81b2c5d1234567890",
+  "userId": "67223344556677889900aabb",
+  "userName": "Jane Doe",
+  "items": [
+    { "type": "coffee", "quantity": 2, "price": 4.5 },
+    { "type": "sandwich", "quantity": 1, "price": 7.0 }
+  ],
+  "totalAmount": 16.0,
+  "status": "pending",
+  "createdAt": "2024-01-01T10:00:00.000Z",
+  "updatedAt": "2024-01-01T10:05:00.000Z",
+  "location": { "latitude": 37.5665, "longitude": 126.9780 }
+}</code></pre>
+                <h4>Error Response 404 (Not Found)</h4>
+                <pre><code>{
+  "message": "Order not found"
+}</code></pre>
+                <h4>Error Response 500 (Server Error)</h4>
+                <pre><code>{
+  "message": "&lt;error message&gt;"
+}</code></pre>
+            </article>
+
+            <article>
+                <h3>4.3 Create a New Order</h3>
+                <p><strong>POST</strong> <code>/api/orders</code></p>
+                <p>Creates a new order. The request body must be JSON.</p>
+                <h4>Request Body (JSON)</h4>
+                <pre><code>{
+  "userId": "67223344556677889900aabb",
+  "userName": "Jane Doe",
+  "items": [
+    { "type": "coffee", "quantity": 2, "price": 4.5 },
+    { "type": "sandwich", "quantity": 1, "price": 7.0 }
+  ],
+  "totalAmount": 16.0,
+  "status": "pending",
+  "location": {
+    "latitude": 37.5665,
+    "longitude": 126.9780
+  }
+}</code></pre>
+                <p>
+                    <code>createdAt</code> and <code>updatedAt</code> are set
+                    automatically by the server.
+                </p>
+                <h4>Response 200 (OK)</h4>
+                <p>Returns the newly created order object:</p>
+                <pre><code>{
+  "_id": "6734f4f81b2c5d1234567890",
+  "userId": "67223344556677889900aabb",
+  "userName": "Jane Doe",
+  "items": [
+    { "type": "coffee", "quantity": 2, "price": 4.5 },
+    { "type": "sandwich", "quantity": 1, "price": 7.0 }
+  ],
+  "totalAmount": 16.0,
+  "status": "pending",
+  "createdAt": "2024-01-01T10:00:00.000Z",
+  "updatedAt": "2024-01-01T10:00:00.000Z",
+  "location": { "latitude": 37.5665, "longitude": 126.9780 }
+}</code></pre>
+                <h4>Error Response 500 (Server Error)</h4>
+                <pre><code>{
+  "message": "&lt;error message&gt;"
+}</code></pre>
+            </article>
+
+            <article>
+                <h3>4.4 Update an Existing Order</h3>
+                <p><strong>PUT</strong> <code>/api/orders/:id</code></p>
+                <p>Updates an existing order with the given ID.</p>
+                <h4>Path Parameter</h4>
+                <ul>
+                    <li><code>id</code>: Order <code>_id</code> value.</li>
+                </ul>
+                <h4>Request Body (JSON)</h4>
+                <p>
+                    You can send any subset of order fields to update. Example:
+                </p>
+                <pre><code>{
+  "status": "shipped",
+  "totalAmount": 18.0,
+  "items": [
+    { "type": "coffee", "quantity": 3, "price": 4.5 },
+    { "type": "sandwich", "quantity": 1, "price": 7.0 }
+  ]
+}</code></pre>
+                <h4>Response 200 (OK)</h4>
+                <p>Returns the updated order object:</p>
+                <pre><code>{
+  "_id": "6734f4f81b2c5d1234567890",
+  "userId": "67223344556677889900aabb",
+  "userName": "Jane Doe",
+  "items": [
+    { "type": "coffee", "quantity": 3, "price": 4.5 },
+    { "type": "sandwich", "quantity": 1, "price": 7.0 }
+  ],
+  "totalAmount": 18.0,
+  "status": "shipped",
+  "createdAt": "2024-01-01T10:00:00.000Z",
+  "updatedAt": "2024-01-01T11:00:00.000Z",
+  "location": { "latitude": 37.5665, "longitude": 126.9780 }
+}</code></pre>
+                <h4>Error Response 404 (Not Found)</h4>
+                <pre><code>{
+  "message": "Order not found"
+}</code></pre>
+                <h4>Error Response 500 (Server Error)</h4>
+                <pre><code>{
+  "message": "&lt;error message&gt;"
+}</code></pre>
+            </article>
+
+            <article>
+                <h3>4.5 Delete an Order</h3>
+                <p><strong>DELETE</strong> <code>/api/orders/:id</code></p>
+                <p>Deletes the order with the given ID.</p>
+                <h4>Path Parameter</h4>
+                <ul>
+                    <li><code>id</code>: Order <code>_id</code> value.</li>
+                </ul>
+                <h4>Response 200 (OK)</h4>
+                <pre><code>{
+  "message": "Order deleted successfully"
+}</code></pre>
+                <h4>Error Response 404 (Not Found)</h4>
+                <pre><code>{
+  "message": "Order not found"
+}</code></pre>
+                <h4>Error Response 500 (Server Error)</h4>
+                <pre><code>{
+  "message": "&lt;error message&gt;"
+}</code></pre>
+            </article>
+        </section>
+
+        <section>
+            <h2>5. Future APIs</h2>
+            <p>
+                This documentation currently covers the <strong>Order</strong>
+                API. When additional resources (such as users, products, or
+                inventory) are added to the server, they can be documented in new
+                sections following the same pattern:
+            </p>
+            <ul>
+                <li>Resource overview and JSON schema.</li>
+                <li>List of endpoints (GET, POST, PUT, DELETE, etc.).</li>
+                <li>Example requests and responses in JSON format.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Klynn API. All rights reserved.</p>
+    </footer>
+</body>
+</html>
