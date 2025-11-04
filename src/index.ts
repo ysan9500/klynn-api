@@ -2,10 +2,13 @@ import express from "express";
 import mongoose from "mongoose";
 import Order from "./models/order.model.js";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const PORT = process.env.PORT || 3000;
 const uri = process.env.MONGODB_URI;
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 
