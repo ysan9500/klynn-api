@@ -9,9 +9,6 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => { 
-});
-
 // Get all orders
 app.get("/api/orders", async (req, res) => {
   try {
