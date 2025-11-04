@@ -9,6 +9,10 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Welcome from Klynn API");
+});
+
 // Get all orders
 app.get("/api/orders", async (req, res) => {
   try {
