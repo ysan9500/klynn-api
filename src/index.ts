@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 import Order from "./models/order.model.js";
 
 const PORT = process.env.PORT || 3000;
-const uri =
-  `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.juzr8vk.mongodb.net/?appName=Cluster0`;
+const uri = process.env.MONGODB_URI;
 const app = express();
 
 app.use(express.json());
