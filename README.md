@@ -1,3 +1,18 @@
+# Klynn API
+
+Backend application that provides API endpoints for Klynn App.
+
+## Technology
+
+Klynn API uses:
+
+- Node.js as runtime environment
+- Express for handling routing, requests, and responses
+- MongoDB for database
+- Vercel for deployment
+
+## How to use
+
 To develop locally:
 
 ```
